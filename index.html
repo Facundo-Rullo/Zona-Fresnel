@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora Zona de Fresnel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef3f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 360px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        h1 {
+            color: #123456;
+            font-size: 24px;
+        }
+
+        .autor {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #aaa;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #123456;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d263f;
+        }
+
+        .resultado {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0b6623;
+        }
+
+        .error {
+            margin-top: 15px;
+            color: red;
+            font-weight: bold;
+        }
+
+        .formula {
+            margin-top: 15px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>Calculadora Zona de Fresnel</h1>
+        <p class="autor">Creado por: Facundo Rullo</p>
+
+        <div class="formula">
+            F1 = 8.656 × √(D / f)
+        </div>
+
+        <label>Distancia D en kilómetros:</label>
+        <input type="text" id="distancia" placeholder="Ej: 5 o 5,5">
+
+        <label>Frecuencia f en GHz:</label>
+        <input type="text" id="frecuencia" placeholder="Ej: 2.4 o 2,4">
+
+        <button onclick="calcularFresnel()">Calcular</button>
+
+        <div id="mensaje"></div>
+        <div id="resultado" class="resultado"></div>
+    </div>
+
+    <script>
+        function validarNumero(valor) {
+            valor = valor.trim().replace(",", ".");
+
+            if (valor === "" || isNaN(valor)) {
+                return null;
+            }
+
+            let numero = Number(valor);
+
+            if (numero <= 0) {
+                return null;
+            }
+
+            return numero;
+        }
+
+        function truncarDosDecimales(numero) {
+            return Math.trunc(numero * 100) / 100;
+        }
+
+        function calcularFresnel() {
+            const distanciaInput = document.getElementById("distancia").value;
+            const frecuenciaInput = document.getElementById("frecuencia").value;
+
+            const mensaje = document.getElementById("mensaje");
+            const resultado = document.getElementById("resultado");
+
+            mensaje.innerHTML = "";
+            resultado.innerHTML = "";
+
+            const distancia = validarNumero(distanciaInput);
+            const frecuencia = validarNumero(frecuenciaInput);
+
+            if (distancia === null || frecuencia === null) {
+                mensaje.innerHTML = '<div class="error">Ingrese solo números válidos. Puede usar coma o punto.</div>';
+                return;
+            }
+
+            const fresnel = 8.656 * Math.sqrt(distancia / frecuencia);
+            const fresnelTruncado = truncarDosDecimales(fresnel);
+
+
+            resultado.innerHTML = `F1 = ${fresnelTruncado.toFixed(2)} metros`;
+        }
+    </script>
+
+</body>
+
+</html>
