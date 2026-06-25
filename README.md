@@ -65,6 +65,9 @@ El resultado se muestra en **metros**, truncado a **dos decimales** (sin redonde
 ```bash
 https://facundo-rullo.github.io/Zona-Fresnel/
 ```
+
+2. Probar
+
 ---
 
 ## 🧮 Ejemplo de cálculo
