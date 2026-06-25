@@ -63,7 +63,7 @@ El resultado se muestra en **metros**, truncado a **dos decimales** (sin redonde
 1. Ingresar a esta URL
 
 ```bash
-[git clone https://github.com/USUARIO/calculadora-zona-fresnel.git](https://facundo-rullo.github.io/Zona-Fresnel/)
+https://facundo-rullo.github.io/Zona-Fresnel/
 ```
 ---
 
