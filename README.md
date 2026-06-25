@@ -50,7 +50,7 @@ El resultado se muestra en **metros**, truncado a **dos decimales** (sin redonde
 
 ### Pantalla principal
 
-> Agregar captura aquí.
+> ![Inicial](imagenes/inicial.png)
 
 ```md
 ![Pantalla Principal](imagenes/principal.png)
