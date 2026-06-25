@@ -60,20 +60,11 @@ El resultado se muestra en **metros**, truncado a **dos decimales** (sin redonde
 
 ## 🚀 Cómo ejecutar el proyecto
 
-1. Descargar o clonar el repositorio.
+1. Ingresar a esta URL
 
 ```bash
-git clone https://github.com/USUARIO/calculadora-zona-fresnel.git
+[git clone https://github.com/USUARIO/calculadora-zona-fresnel.git](https://facundo-rullo.github.io/Zona-Fresnel/)
 ```
-
-2. Abrir el archivo:
-
-```
-index.html
-```
-
-No requiere instalación ni servidor.
-
 ---
 
 ## 🧮 Ejemplo de cálculo
