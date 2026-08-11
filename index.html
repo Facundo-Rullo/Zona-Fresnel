@@ -3,202 +3,1628 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculadora educativa de la primera zona de Fresnel con análisis opcional de alturas, curvatura terrestre y obstáculos.">
     <title>Calculadora Zona de Fresnel</title>
     <style>
-       *{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #eef3f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+        :root {
+            --bg: #f3efe7;
+            --bg-soft: #fbf8f2;
+            --card: #fffdf9;
+            --line: #ddd2c1;
+            --line-strong: #c9baa5;
+            --text: #2e2b26;
+            --muted: #6a6358;
+            --green: #2f6a43;
+            --green-dark: #1f4a2e;
+            --green-soft: #edf8f0;
+            --sage: #b8cdb9;
+            --yellow: #946518;
+            --yellow-soft: #fff4de;
+            --red: #a1372d;
+            --red-soft: #fbe9e7;
+            --blue: #315e75;
+            --blue-soft: #eaf4f7;
+            --shadow: 0 20px 45px rgba(72, 56, 33, 0.12);
+            --shadow-small: 0 9px 24px rgba(72, 56, 33, 0.09);
+        }
 
-.card {
-    background: white;
-    padding: 35px;
-    border-radius: 15px;
-    width: 600px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
+        html {
+            scroll-behavior: smooth;
+        }
 
-h1 {
-    color: #123456;
-    font-size: 38px;
-    text-align: center;
-    margin-bottom: 12px;
-}
+        body {
+            min-height: 100vh;
+            font-family: "Trebuchet MS", Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(72, 120, 85, 0.17), transparent 28%),
+                radial-gradient(circle at 92% 88%, rgba(183, 145, 78, 0.15), transparent 25%),
+                linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+            padding: 22px;
+        }
 
-.autor {
-    font-size: 15px;
-    color: #555;
-    text-align: center;
-    margin-bottom: 20px;
-}
+        button,
+        input {
+            font: inherit;
+        }
 
-.formula {
-    margin-bottom: 20px;
-    background: #f4f4f4;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-}
+        button {
+            border: 0;
+        }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    margin-top: 15px;
-    font-size: 18px;
-    font-weight: bold;
-}
+        .app-shell {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
 
-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px 14px;
-    border: 1px solid #bfc7d1;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    transition: .2s;
-}
+        .hero {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 24px;
+            align-items: center;
+            padding: 34px;
+            color: #f7fff8;
+            background: linear-gradient(135deg, #214e31 0%, #3d754b 58%, #678958 100%);
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+        }
 
-input::placeholder {
-    color: #8d8d8d;
-}
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            right: -120px;
+            top: -170px;
+            border: 42px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
 
-input:focus {
-    border-color: #123456;
-    box-shadow: 0 0 0 3px rgba(18, 52, 86, .15);
-}
+        .hero h1 {
+            max-width: 760px;
+            margin-bottom: 12px;
+            font-size: clamp(34px, 5vw, 54px);
+            line-height: 0.98;
+            letter-spacing: -0.045em;
+        }
 
-button {
-    width: 100%;
-    margin-top: 25px;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background: #123456;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: .2s;
-}
+        .hero p {
+            max-width: 720px;
+            color: rgba(247, 255, 248, 0.83);
+            font-size: 17px;
+            line-height: 1.5;
+        }
 
-button:hover {
-    background: #0d263f;
-}
+        .author-card {
+            position: relative;
+            z-index: 1;
+            min-width: 210px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 19px;
+            backdrop-filter: blur(8px);
+        }
 
-.resultado {
-    margin-top: 25px;
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    color: #0b6623;
-}
+        .author-card small {
+            display: block;
+            margin-bottom: 5px;
+            color: rgba(247, 255, 248, 0.7);
+        }
 
-.error {
-    margin-top: 18px;
-    text-align: center;
-    color: #c62828;
-    font-weight: bold;
-    font-size: 16px;
-}
+        .author-card strong {
+            font-size: 18px;
+        }
 
-@media (max-width: 480px) {
-    .card {
-        width: 95%;
-        padding: 25px;
-    }
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+            gap: 24px;
+            margin-top: 24px;
+        }
 
-    h1 {
-        font-size: 30px;
-    }
+        .panel,
+        .side-panel {
+            background: var(--card);
+            border: 1px solid rgba(221, 210, 193, 0.95);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+        }
 
-    .resultado {
-        font-size: 24px;
-    }
-}
+        .panel {
+            min-width: 0;
+            padding: 30px;
+        }
+
+        .side-panel {
+            position: sticky;
+            top: 20px;
+            align-self: start;
+            padding: 24px;
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+            padding: 6px;
+            margin-bottom: 24px;
+            background: #eee9df;
+            border-radius: 18px;
+        }
+
+        .mode-button {
+            padding: 12px 14px;
+            color: var(--muted);
+            background: transparent;
+            border-radius: 13px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .mode-button[aria-selected="true"] {
+            color: var(--green-dark);
+            background: #fff;
+            box-shadow: 0 5px 14px rgba(72, 56, 33, 0.1);
+        }
+
+        .formula-card {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 26px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #f0f6ed, #f8f4e9);
+            border: 1px solid #d8e3d2;
+            border-radius: 21px;
+        }
+
+        .formula-copy small {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+        }
+
+        .formula-copy {
+            min-width: 0;
+        }
+
+        .formula-copy strong {
+            color: var(--green-dark);
+            font-size: clamp(21px, 4vw, 29px);
+            letter-spacing: -0.025em;
+        }
+
+        .formula-tag {
+            flex: 0 0 auto;
+            padding: 8px 10px;
+            color: var(--green-dark);
+            background: #fff;
+            border: 1px solid #d5dfd0;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: end;
+            margin: 4px 0 17px;
+        }
+
+        .section-heading h2 {
+            font-size: 23px;
+            letter-spacing: -0.02em;
+        }
+
+        .section-heading p {
+            max-width: 500px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field.wide {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .field-hint {
+            min-height: 17px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            color: var(--text);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #9b9183;
+        }
+
+        input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 4px rgba(47, 106, 67, 0.13);
+            transform: translateY(-1px);
+        }
+
+        input.invalid {
+            border-color: var(--red);
+            background: #fffafa;
+        }
+
+        .advanced-section {
+            margin-top: 28px;
+            padding-top: 27px;
+            border-top: 1px solid #e8dfd2;
+        }
+
+        .advanced-section[hidden],
+        .mode-guide[hidden],
+        .profile-card[hidden] {
+            display: none;
+        }
+
+        .obstacles-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            margin-top: 26px;
+            margin-bottom: 14px;
+        }
+
+        .obstacles-header h3 {
+            font-size: 19px;
+        }
+
+        .obstacles-header p {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .obstacles-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .empty-obstacles {
+            padding: 19px;
+            color: var(--muted);
+            background: var(--bg-soft);
+            border: 1px dashed var(--line-strong);
+            border-radius: 17px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .obstacle-card {
+            position: relative;
+            padding: 17px;
+            background: #fcfaf6;
+            border: 1px solid #e6dccd;
+            border-radius: 18px;
+        }
+
+        .obstacle-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .obstacle-title strong {
+            color: var(--green-dark);
+        }
+
+        .obstacle-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 11px;
+        }
+
+        .obstacle-grid .field label {
+            font-size: 12px;
+        }
+
+        .icon-button {
+            display: inline-grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            color: var(--red);
+            background: var(--red-soft);
+            border-radius: 11px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 11px;
+            margin-top: 27px;
+        }
+
+        .button {
+            padding: 13px 17px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+
+        .button:focus-visible,
+        .mode-button:focus-visible,
+        .icon-button:focus-visible {
+            outline: 3px solid rgba(49, 94, 117, 0.28);
+            outline-offset: 2px;
+        }
+
+        .button.primary {
+            flex: 1;
+            min-width: 210px;
+            color: #f7fff8;
+            background: var(--green);
+            box-shadow: 0 8px 18px rgba(47, 106, 67, 0.2);
+        }
+
+        .button.secondary {
+            color: var(--text);
+            background: #ece7dd;
+        }
+
+        .button.ghost {
+            padding: 10px 13px;
+            color: var(--green-dark);
+            background: var(--green-soft);
+            border: 1px solid #cfe1d1;
+        }
+
+        .message {
+            display: none;
+            margin-top: 19px;
+            padding: 14px 16px;
+            color: var(--red);
+            background: var(--red-soft);
+            border: 1px solid #efcbc6;
+            border-radius: 15px;
+            font-weight: bold;
+            line-height: 1.45;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .result {
+            display: none;
+            min-width: 0;
+            margin-top: 24px;
+            animation: reveal 0.35s ease both;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status {
+            padding: 19px 20px;
+            border-radius: 19px;
+        }
+
+        .status.ok {
+            color: var(--green-dark);
+            background: var(--green-soft);
+            border: 1px solid #cfe4d2;
+        }
+
+        .status.info {
+            color: var(--blue);
+            background: var(--blue-soft);
+            border: 1px solid #c9dfe7;
+        }
+
+        .status.warn {
+            color: var(--yellow);
+            background: var(--yellow-soft);
+            border: 1px solid #ecd9ae;
+        }
+
+        .status.bad {
+            color: var(--red);
+            background: var(--red-soft);
+            border: 1px solid #efcbc6;
+        }
+
+        .status-kicker {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .status-title {
+            display: block;
+            font-size: 25px;
+            line-height: 1.18;
+        }
+
+        .status-note {
+            margin-top: 8px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 11px;
+            margin-top: 14px;
+        }
+
+        .stats[hidden] {
+            display: none;
+        }
+
+        .stat {
+            min-width: 0;
+            padding: 15px;
+            background: #fcfbf8;
+            border: 1px solid #eee4d6;
+            border-radius: 16px;
+        }
+
+        .stat strong {
+            display: block;
+            min-height: 30px;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: 0.035em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+
+        .stat span {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 21px;
+            font-weight: bold;
+            line-height: 1.15;
+        }
+
+        .profile-card {
+            min-width: 0;
+            margin-top: 16px;
+            padding: 18px;
+            background: #fcfbf8;
+            border: 1px solid #e9dfd1;
+            border-radius: 19px;
+        }
+
+        .card-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            align-items: start;
+            margin-bottom: 13px;
+        }
+
+        .card-heading h3 {
+            margin-bottom: 4px;
+            font-size: 18px;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .profile-wrap {
+            min-width: 0;
+            overflow: hidden;
+            background: linear-gradient(#f8fcfd, #f4f1e8);
+            border: 1px solid #e4ded2;
+            border-radius: 15px;
+        }
+
+        #profile-svg {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 260px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-top: 11px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .side-panel h2 {
+            margin-bottom: 9px;
+            font-size: 25px;
+            letter-spacing: -0.025em;
+        }
+
+        .side-intro {
+            margin-bottom: 17px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .guide {
+            display: grid;
+            gap: 10px;
+        }
+
+        .guide-item {
+            padding: 13px 14px;
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .guide-item strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--green-dark);
+        }
+
+        .scale {
+            display: grid;
+            gap: 10px;
+        }
+
+        .scale-row {
+            display: grid;
+            grid-template-columns: 54px 1fr;
+            gap: 10px;
+            align-items: start;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .scale-badge {
+            padding: 5px 6px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .scale-badge.full {
+            color: var(--green-dark);
+            background: var(--green-soft);
+        }
+
+        .scale-badge.good {
+            color: var(--blue);
+            background: var(--blue-soft);
+        }
+
+        .scale-badge.warn {
+            color: var(--yellow);
+            background: var(--yellow-soft);
+        }
+
+        .scale-badge.bad {
+            color: var(--red);
+            background: var(--red-soft);
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .side-panel {
+                position: static;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 12px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 25px;
+                border-radius: 24px;
+            }
+
+            .author-card {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .panel,
+            .side-panel {
+                padding: 19px;
+                border-radius: 22px;
+            }
+
+            .grid,
+            .obstacle-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .field.wide {
+                grid-column: auto;
+            }
+
+            .formula-card,
+            .section-heading,
+            .obstacles-header,
+            .card-heading {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .formula-tag {
+                align-self: start;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .mode-switch,
+            .grid,
+            .obstacle-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .stat strong {
+                min-height: 0;
+            }
+
+            #profile-svg {
+                min-height: 220px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition: none !important;
+                animation: none !important;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="app-shell">
+        <header class="hero">
+            <div>
+                <h1>Calculadora Zona de Fresnel</h1>
+                <p>
+                    Empezá con el cálculo de la consigna o abrí el análisis avanzado para estudiar alturas,
+                    obstáculos y curvatura terrestre sobre un perfil visual del enlace.
+                </p>
+            </div>
+            <div class="author-card">
+                <small>Creado por</small>
+                <strong>Facundo Rullo</strong>
+            </div>
+        </header>
 
-    <div class="card">
-        <h1>Calculadora Zona de Fresnel</h1>
-        <p class="autor">Creado por: Facundo Rullo</p>
+        <main class="layout">
+            <section class="panel">
+                <div class="mode-switch" role="tablist" aria-label="Tipo de cálculo">
+                    <button class="mode-button" id="tab-basico" type="button" role="tab" aria-selected="true" aria-controls="advanced-fields" data-mode="basico">
+                        Cálculo básico
+                    </button>
+                    <button class="mode-button" id="tab-avanzado" type="button" role="tab" aria-selected="false" aria-controls="advanced-fields" data-mode="avanzado">
+                        Análisis avanzado
+                    </button>
+                </div>
 
-        <div class="formula">
-            F1 = 8.656 × √(D / f)
-        </div>
+                <div class="formula-card">
+                    <div class="formula-copy">
+                        <small id="formula-caption">Radio máximo de la primera zona de Fresnel</small>
+                        <strong id="formula-text">F1 = 8.656 × √(D / f)</strong>
+                    </div>
+                    <span class="formula-tag" id="formula-tag">Consigna original</span>
+                </div>
 
-        <label>Distancia D en kilómetros:</label>
-        <input type="text" id="distancia" placeholder="Ej: 5 o 5,5">
+                <form id="calculator-form" novalidate>
+                    <div class="section-heading">
+                        <div>
+                            <h2>Datos principales</h2>
+                            <p>La distancia se expresa en kilómetros, la frecuencia en GHz y los resultados en metros.</p>
+                        </div>
+                    </div>
 
-        <label>Frecuencia f en GHz:</label>
-        <input type="text" id="frecuencia" placeholder="Ej: 2.4 o 2,4">
+                    <div class="grid">
+                        <div class="field">
+                            <label for="distancia">Distancia D en kilómetros:</label>
+                            <input id="distancia" type="text" inputmode="decimal" autocomplete="off" placeholder="Ejemplo: 5 o 5,5">
+                            <span class="field-hint">Kilómetros entre las dos antenas.</span>
+                        </div>
+                        <div class="field">
+                            <label for="frecuencia">Frecuencia f en GHz:</label>
+                            <input id="frecuencia" type="text" inputmode="decimal" autocomplete="off" placeholder="Ejemplo: 2.4 o 2,4">
+                            <span class="field-hint">Podés escribir con coma o punto.</span>
+                        </div>
+                    </div>
 
-        <button onclick="calcularFresnel()">Calcular</button>
+                    <section class="advanced-section" id="advanced-fields" role="tabpanel" aria-labelledby="tab-avanzado" hidden>
+                        <div class="section-heading">
+                            <div>
+                                <h2>Perfil de las antenas</h2>
+                                <p>Separar elevación del terreno y altura de la torre evita comparar medidas con referencias diferentes.</p>
+                            </div>
+                        </div>
 
-        <div id="mensaje"></div>
-        <div id="resultado" class="resultado"></div>
+                        <div class="grid">
+                            <div class="field">
+                                <label for="elevacion-a">Elevación del terreno A</label>
+                                <input id="elevacion-a" type="text" inputmode="decimal" autocomplete="off" value="0">
+                                <span class="field-hint">Metros sobre el nivel del mar.</span>
+                            </div>
+                            <div class="field">
+                                <label for="altura-a">Altura de la antena A</label>
+                                <input id="altura-a" type="text" inputmode="decimal" autocomplete="off" placeholder="Ejemplo: 18">
+                                <span class="field-hint">Desde el terreno hasta la antena.</span>
+                            </div>
+                            <div class="field">
+                                <label for="elevacion-b">Elevación del terreno B</label>
+                                <input id="elevacion-b" type="text" inputmode="decimal" autocomplete="off" value="0">
+                                <span class="field-hint">Metros sobre el nivel del mar.</span>
+                            </div>
+                            <div class="field">
+                                <label for="altura-b">Altura de la antena B</label>
+                                <input id="altura-b" type="text" inputmode="decimal" autocomplete="off" placeholder="Ejemplo: 22">
+                                <span class="field-hint">Desde el terreno hasta la antena.</span>
+                            </div>
+                        </div>
+
+                        <div class="obstacles-header">
+                            <div>
+                                <h3>Obstáculos</h3>
+                                <p>Podés analizar ninguno, uno o varios puntos críticos.</p>
+                            </div>
+                            <button class="button ghost" id="add-obstacle" type="button">+ Agregar obstáculo</button>
+                        </div>
+
+                        <div class="obstacles-list" id="obstacles-list"></div>
+                    </section>
+
+                    <div class="toolbar">
+                        <button class="button primary" type="submit">Calcular enlace</button>
+                        <button class="button secondary" id="load-example" type="button">Probar ejemplo</button>
+                        <button class="button secondary" id="clear-form" type="button">Borrar</button>
+                    </div>
+                </form>
+
+                <div class="message" id="message" role="alert"></div>
+
+                <section class="result" id="result" aria-live="polite">
+                    <div class="status" id="status">
+                        <span class="status-kicker" id="status-kicker"></span>
+                        <strong class="status-title" id="status-title"></strong>
+                        <p class="status-note" id="status-note"></p>
+                    </div>
+
+                    <div class="stats" id="result-stats" hidden>
+                        <div class="stat"><strong id="stat-label-1">-</strong><span id="stat-value-1">-</span></div>
+                        <div class="stat"><strong id="stat-label-2">-</strong><span id="stat-value-2">-</span></div>
+                        <div class="stat"><strong id="stat-label-3">-</strong><span id="stat-value-3">-</span></div>
+                    </div>
+
+                    <div class="profile-card" id="profile-card" hidden>
+                        <div class="card-heading">
+                            <div>
+                                <h3>Perfil estimado del enlace</h3>
+                                <p>La escala vertical se adapta para que los elementos sean legibles; no representa la escala horizontal.</p>
+                            </div>
+                        </div>
+                        <div class="profile-wrap">
+                            <svg id="profile-svg" viewBox="0 0 900 340" role="img" aria-label="Perfil del radioenlace"></svg>
+                        </div>
+                        <div class="legend">
+                            <span class="legend-item"><span class="legend-dot" style="background:#dcebd7"></span>Primera zona de Fresnel</span>
+                            <span class="legend-item"><span class="legend-dot" style="background:#447752"></span>Línea de vista</span>
+                            <span class="legend-item"><span class="legend-dot" style="background:#dfb85f"></span>Límite de 60%</span>
+                            <span class="legend-item"><span class="legend-dot" style="background:#87745b"></span>Terreno y obstáculos</span>
+                        </div>
+                    </div>
+
+                </section>
+            </section>
+
+            <aside class="side-panel">
+                <div class="mode-guide" id="basic-guide">
+                    <h2>Una respuesta directa</h2>
+                    <p class="side-intro">
+                        El modo básico conserva exactamente la fórmula de la materia y calcula el radio máximo de F1,
+                        que aparece en el centro del enlace.
+                    </p>
+                    <div class="guide">
+                        <div class="guide-item">
+                            <strong>1. Distancia</strong>
+                            Ingresá la separación total entre las antenas en kilómetros.
+                        </div>
+                        <div class="guide-item">
+                            <strong>2. Frecuencia</strong>
+                            Ingresala en GHz. Se aceptan coma y punto decimal.
+                        </div>
+                        <div class="guide-item">
+                            <strong>3. Resultado</strong>
+                            Todos los valores se truncan a dos decimales, sin redondear.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mode-guide" id="advanced-guide" hidden>
+                    <h2>Cómo leer el despeje</h2>
+                    <p class="side-intro">
+                        El porcentaje compara el espacio libre vertical con el radio F1 calculado para el enlace.
+                        Puede superar 100% cuando sobra altura.
+                    </p>
+                    <div class="scale">
+                        <div class="scale-row">
+                            <span class="scale-badge full">≥100%</span>
+                            <span>La primera zona está completamente despejada en el punto más exigente.</span>
+                        </div>
+                        <div class="scale-row">
+                            <span class="scale-badge good">≥60%</span>
+                            <span>Cumple el criterio geométrico habitual de despeje.</span>
+                        </div>
+                        <div class="scale-row">
+                            <span class="scale-badge warn">0–60%</span>
+                            <span>Hay línea visual, pero no alcanza el despeje recomendado.</span>
+                        </div>
+                        <div class="scale-row">
+                            <span class="scale-badge bad">≤0%</span>
+                            <span>El terreno u obstáculo alcanza o cruza la línea de vista geométrica.</span>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+        </main>
+
     </div>
 
     <script>
-        function validarNumero(valor) {
-            valor = valor.trim().replace(",", ".");
+        const FRESNEL_CENTER_CONSTANT = 8.656;
+        const EARTH_RADIUS_METERS = 6371000;
+        const DEFAULT_EARTH_RADIUS_FACTOR = 4 / 3;
+        const SVG_NS = "http://www.w3.org/2000/svg";
 
-            if (valor === "" || isNaN(valor)) {
-                return null;
-            }
+        let currentMode = "basico";
+        let obstacleSequence = 0;
 
-            let numero = Number(valor);
-
-            if (numero <= 0) {
-                return null;
-            }
-
-            return numero;
-        }
+        const byId = (id) => document.getElementById(id);
 
         function truncarDosDecimales(numero) {
             return Math.trunc(numero * 100) / 100;
         }
 
-        function calcularFresnel() {
-            const distanciaInput = document.getElementById("distancia").value;
-            const frecuenciaInput = document.getElementById("frecuencia").value;
+        function formatear(numero) {
+            return truncarDosDecimales(numero).toFixed(2);
+        }
 
-            const mensaje = document.getElementById("mensaje");
-            const resultado = document.getElementById("resultado");
+        function formatearCompacto(numero) {
+            return new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(numero);
+        }
 
-            mensaje.innerHTML = "";
-            resultado.innerHTML = "";
+        function parsearNumero(texto, opciones = {}) {
+            const { permitirCero = false, permitirNegativo = false } = opciones;
+            const valor = texto.trim();
+            const patron = permitirNegativo ? /^-?\d+(?:[.,]\d+)?$/ : /^\d+(?:[.,]\d+)?$/;
 
-            const distancia = validarNumero(distanciaInput);
-            const frecuencia = validarNumero(frecuenciaInput);
+            if (!patron.test(valor)) {
+                return null;
+            }
 
-            if (distancia === null || frecuencia === null) {
-                mensaje.innerHTML = '<div class="error">Ingrese solo números válidos. Puede usar coma o punto.</div>';
+            const numero = Number(valor.replace(",", "."));
+
+            if (!Number.isFinite(numero)) {
+                return null;
+            }
+
+            if (permitirNegativo) {
+                return numero;
+            }
+
+            if (permitirCero) {
+                return numero >= 0 ? numero : null;
+            }
+
+            return numero > 0 ? numero : null;
+        }
+
+        function limpiarErrores() {
+            document.querySelectorAll("input.invalid").forEach((input) => {
+                input.classList.remove("invalid");
+                input.removeAttribute("aria-invalid");
+            });
+            byId("message").className = "message";
+            byId("message").textContent = "";
+        }
+
+        function marcarInvalido(input) {
+            input.classList.add("invalid");
+            input.setAttribute("aria-invalid", "true");
+        }
+
+        function mostrarErrores(errores) {
+            const message = byId("message");
+            message.className = "message show";
+            message.textContent = errores.length === 1
+                ? errores[0]
+                : `Revisá estos datos: ${errores.join(" · ")}`;
+
+            const firstInvalid = document.querySelector("input.invalid");
+            if (firstInvalid) {
+                firstInvalid.focus();
+            }
+        }
+
+        function leerCampo(id, opciones, nombre, errores) {
+            const input = byId(id);
+            const numero = parsearNumero(input.value, opciones);
+
+            if (numero === null) {
+                marcarInvalido(input);
+                errores.push(nombre);
+            }
+
+            return numero;
+        }
+
+        function radioFresnelMaximo(distancia, frecuencia) {
+            return FRESNEL_CENTER_CONSTANT * Math.sqrt(distancia / frecuencia);
+        }
+
+        function curvaturaEfectiva(distanciaDesdeA, distanciaTotal, factorK) {
+            const d1Metros = distanciaDesdeA * 1000;
+            const d2Metros = (distanciaTotal - distanciaDesdeA) * 1000;
+            return (d1Metros * d2Metros) / (2 * factorK * EARTH_RADIUS_METERS);
+        }
+
+        function interpolar(inicio, fin, proporcion) {
+            return inicio + (fin - inicio) * proporcion;
+        }
+
+        function cambiarModo(mode) {
+            currentMode = mode;
+            const advanced = mode === "avanzado";
+
+            document.querySelectorAll(".mode-button").forEach((button) => {
+                button.setAttribute("aria-selected", String(button.dataset.mode === mode));
+            });
+
+            byId("advanced-fields").hidden = !advanced;
+            byId("basic-guide").hidden = advanced;
+            byId("advanced-guide").hidden = !advanced;
+            byId("formula-caption").textContent = advanced
+                ? "Fórmula de la consigna aplicada al enlace"
+                : "Radio máximo de la primera zona de Fresnel";
+            byId("formula-text").textContent = "F1 = 8.656 × √(D / f)";
+            byId("formula-tag").textContent = "Consigna original";
+            ocultarResultado();
+            limpiarErrores();
+        }
+
+        function actualizarVacioObstaculos() {
+            const list = byId("obstacles-list");
+            if (list.querySelector(".obstacle-card")) {
+                const empty = list.querySelector(".empty-obstacles");
+                if (empty) empty.remove();
                 return;
             }
 
-            const fresnel = 8.656 * Math.sqrt(distancia / frecuencia);
-            const fresnelTruncado = truncarDosDecimales(fresnel);
-
-
-            resultado.innerHTML = `F1 = ${fresnelTruncado.toFixed(2)} metros`;
+            const empty = document.createElement("div");
+            empty.className = "empty-obstacles";
+            empty.textContent = "No agregaste obstáculos. El cálculo analizará solamente el terreno estimado y la curvatura efectiva.";
+            list.appendChild(empty);
         }
-    </script>
 
+        function agregarObstaculo(valores = {}) {
+            obstacleSequence += 1;
+            const card = document.createElement("article");
+            card.className = "obstacle-card";
+            card.dataset.obstacleId = String(obstacleSequence);
+
+            const title = document.createElement("div");
+            title.className = "obstacle-title";
+
+            const heading = document.createElement("strong");
+            heading.textContent = `Obstáculo ${document.querySelectorAll(".obstacle-card").length + 1}`;
+
+            const removeButton = document.createElement("button");
+            removeButton.className = "icon-button";
+            removeButton.type = "button";
+            removeButton.setAttribute("aria-label", "Eliminar obstáculo");
+            removeButton.textContent = "×";
+            removeButton.addEventListener("click", () => {
+                card.remove();
+                renumerarObstaculos();
+                actualizarVacioObstaculos();
+                ocultarResultado();
+            });
+
+            title.append(heading, removeButton);
+
+            const grid = document.createElement("div");
+            grid.className = "obstacle-grid";
+            grid.append(
+                crearCampoObstaculo("Nombre", "obstacle-name", valores.nombre ?? "", "Ej: edificio", "text"),
+                crearCampoObstaculo("Distancia desde A (km)", "obstacle-distance", valores.distancia ?? "", "Ej: 4"),
+                crearCampoObstaculo("Altura sobre terreno (m)", "obstacle-height", valores.altura ?? "0", "Ej: 12")
+            );
+
+            card.append(title, grid);
+            const empty = byId("obstacles-list").querySelector(".empty-obstacles");
+            if (empty) empty.remove();
+            byId("obstacles-list").appendChild(card);
+            ocultarResultado();
+        }
+
+        function crearCampoObstaculo(labelText, className, value, placeholder, type = "decimal") {
+            const wrapper = document.createElement("div");
+            wrapper.className = "field";
+
+            const label = document.createElement("label");
+            const inputId = `${className}-${obstacleSequence}`;
+            label.htmlFor = inputId;
+            label.textContent = labelText;
+
+            const input = document.createElement("input");
+            input.id = inputId;
+            input.className = className;
+            input.type = "text";
+            input.autocomplete = "off";
+            input.placeholder = placeholder;
+            input.value = value;
+            if (type === "decimal") input.inputMode = "decimal";
+
+            wrapper.append(label, input);
+            return wrapper;
+        }
+
+        function renumerarObstaculos() {
+            document.querySelectorAll(".obstacle-card").forEach((card, index) => {
+                card.querySelector(".obstacle-title strong").textContent = `Obstáculo ${index + 1}`;
+            });
+        }
+
+        function leerDatosComunes(errores) {
+            return {
+                distancia: leerCampo("distancia", {}, "distancia total", errores),
+                frecuencia: leerCampo("frecuencia", {}, "frecuencia", errores)
+            };
+        }
+
+        function leerObstaculos(distanciaTotal, errores) {
+            return Array.from(document.querySelectorAll(".obstacle-card")).map((card, index) => {
+                const distanceInput = card.querySelector(".obstacle-distance");
+                const heightInput = card.querySelector(".obstacle-height");
+                const nombreInput = card.querySelector(".obstacle-name");
+                const nombre = nombreInput.value.trim() || `Obstáculo ${index + 1}`;
+                const distancia = parsearNumero(distanceInput.value);
+                const altura = parsearNumero(heightInput.value, { permitirCero: true });
+
+                if (distancia === null || distancia >= distanciaTotal) {
+                    marcarInvalido(distanceInput);
+                    errores.push(`${nombre}: posición mayor que 0 y menor que la distancia total`);
+                }
+                if (altura === null) {
+                    marcarInvalido(heightInput);
+                    errores.push(`${nombre}: altura`);
+                }
+
+                return { nombre, distancia, altura };
+            });
+        }
+
+        function setStat(index, label, value) {
+            byId(`stat-label-${index}`).textContent = label;
+            byId(`stat-value-${index}`).textContent = value;
+        }
+
+        function setStatus(style, kicker, title, note) {
+            byId("status").className = `status ${style}`;
+            byId("status-kicker").textContent = kicker;
+            byId("status-title").textContent = title;
+            const statusNote = byId("status-note");
+            statusNote.textContent = note;
+            statusNote.hidden = !note;
+        }
+
+        function mostrarResultado() {
+            byId("result").className = "result show";
+        }
+
+        function ocultarResultado() {
+            byId("result").className = "result";
+            byId("profile-card").hidden = true;
+            byId("result-stats").hidden = true;
+        }
+
+        function calcularBasico() {
+            limpiarErrores();
+            ocultarResultado();
+            const errores = [];
+            const { distancia, frecuencia } = leerDatosComunes(errores);
+
+            if (errores.length) {
+                mostrarErrores(errores);
+                return;
+            }
+
+            const fresnel = radioFresnelMaximo(distancia, frecuencia);
+            byId("result-stats").hidden = true;
+            setStatus(
+                "ok",
+                "Cálculo básico completo",
+                `Radio máximo: ${formatear(fresnel)} metros`,
+                ""
+            );
+            setStat(1, "Radio máximo F1", `${formatear(fresnel)} m`);
+            setStat(2, "60% de F1", `${formatear(fresnel * 0.6)} m`);
+            setStat(3, "Ubicación del máximo", `${formatear(distancia / 2)} km`);
+            mostrarResultado();
+        }
+
+        function calcularAvanzado() {
+            limpiarErrores();
+            ocultarResultado();
+            const errores = [];
+            const { distancia, frecuencia } = leerDatosComunes(errores);
+            const elevacionA = leerCampo("elevacion-a", { permitirNegativo: true }, "elevación del terreno A", errores);
+            const alturaA = leerCampo("altura-a", {}, "altura de la antena A", errores);
+            const elevacionB = leerCampo("elevacion-b", { permitirNegativo: true }, "elevación del terreno B", errores);
+            const alturaB = leerCampo("altura-b", {}, "altura de la antena B", errores);
+            const factorK = DEFAULT_EARTH_RADIUS_FACTOR;
+
+            let obstacles = [];
+            if (distancia !== null) {
+                obstacles = leerObstaculos(distancia, errores);
+            }
+
+            if (errores.length) {
+                mostrarErrores(errores);
+                return;
+            }
+
+            const data = { distancia, frecuencia, elevacionA, alturaA, elevacionB, alturaB, factorK, obstacles };
+            const analysis = analizarPerfil(data);
+            presentarAnalisis(data, analysis);
+        }
+
+        function analizarPerfil(data) {
+            const antennaA = data.elevacionA + data.alturaA;
+            const antennaB = data.elevacionB + data.alturaB;
+            const samples = [];
+
+            for (let index = 0; index <= 240; index += 1) {
+                const proporcion = index / 240;
+                const posicion = data.distancia * proporcion;
+                const fresnel = radioFresnelMaximo(data.distancia, data.frecuencia);
+                const lineOfSight = interpolar(antennaA, antennaB, proporcion);
+                const groundBase = interpolar(data.elevacionA, data.elevacionB, proporcion);
+                const bulge = curvaturaEfectiva(posicion, data.distancia, data.factorK);
+                const adjustedGround = groundBase + bulge;
+                const clearance = lineOfSight - adjustedGround;
+                const percentage = fresnel > 0 ? (clearance / fresnel) * 100 : Infinity;
+
+                samples.push({ posicion, fresnel, lineOfSight, groundBase, bulge, adjustedGround, clearance, percentage });
+            }
+
+            const terrainCritical = samples.slice(1, -1).reduce((worst, sample) => {
+                return !worst || sample.percentage < worst.percentage ? sample : worst;
+            }, null);
+
+            const obstacleResults = data.obstacles.map((obstacle) => {
+                const proporcion = obstacle.distancia / data.distancia;
+                const fresnel = radioFresnelMaximo(data.distancia, data.frecuencia);
+                const lineOfSight = interpolar(antennaA, antennaB, proporcion);
+                const groundBase = interpolar(data.elevacionA, data.elevacionB, proporcion);
+                const bulge = curvaturaEfectiva(obstacle.distancia, data.distancia, data.factorK);
+                const adjustedTop = groundBase + obstacle.altura + bulge;
+                const clearance = lineOfSight - adjustedTop;
+                const percentage = (clearance / fresnel) * 100;
+
+                return {
+                    nombre: obstacle.nombre,
+                    posicion: obstacle.distancia,
+                    fresnel,
+                    bulge,
+                    lineOfSight,
+                    groundBase,
+                    adjustedTop,
+                    clearance,
+                    percentage,
+                    obstacle
+                };
+            });
+
+            const terrainRow = {
+                nombre: "Terreno estimado",
+                posicion: terrainCritical.posicion,
+                fresnel: terrainCritical.fresnel,
+                bulge: terrainCritical.bulge,
+                lineOfSight: terrainCritical.lineOfSight,
+                adjustedTop: terrainCritical.adjustedGround,
+                clearance: terrainCritical.clearance,
+                percentage: terrainCritical.percentage
+            };
+
+            const rows = [terrainRow, ...obstacleResults];
+            const worst = rows.reduce((current, row) => row.percentage < current.percentage ? row : current);
+
+            return {
+                antennaA,
+                antennaB,
+                samples,
+                obstacleResults,
+                rows,
+                worst,
+                maxFresnel: radioFresnelMaximo(data.distancia, data.frecuencia)
+            };
+        }
+
+        function presentarAnalisis(data, analysis) {
+            const worst = analysis.worst;
+            byId("result-stats").hidden = false;
+            let style;
+            let title;
+            let note;
+
+            if (worst.clearance <= 0) {
+                style = "bad";
+                title = "Línea de vista obstruida";
+                note = worst.clearance < 0
+                    ? `${worst.nombre} supera la línea directa en ${formatear(Math.abs(worst.clearance))} m. Esto describe la geometría; no es una predicción completa de recepción.`
+                    : `${worst.nombre} alcanza la línea directa entre las antenas. Esto describe la geometría; no es una predicción completa de recepción.`;
+            } else if (worst.percentage < 60) {
+                style = "warn";
+                title = "Despeje insuficiente";
+                note = `${worst.nombre} conserva ${formatear(worst.percentage)}% de F1. Hay línea visual, pero no alcanza el criterio recomendado del 60%.`;
+            } else if (worst.percentage < 100) {
+                style = "info";
+                title = "Cumple el criterio del 60%";
+                note = `${worst.nombre} es el punto más exigente, con ${formatear(worst.percentage)}% de despeje respecto de F1.`;
+            } else {
+                style = "ok";
+                title = "Primera zona completamente despejada";
+                note = `Incluso en ${worst.nombre}, el punto más exigente, queda un despeje equivalente a ${formatear(worst.percentage)}% de F1.`;
+            }
+
+            setStatus(style, "Evaluación geométrica del perfil", title, note);
+            setStat(1, "Radio máximo F1", `${formatear(analysis.maxFresnel)} m`);
+            setStat(2, "Peor despeje / F1", `${formatear(worst.percentage)} %`);
+            setStat(3, "Punto más exigente", worst.nombre);
+
+            dibujarPerfil(data, analysis);
+            byId("profile-card").hidden = false;
+            mostrarResultado();
+        }
+
+        function svgElement(tag, attributes = {}, text = "") {
+            const element = document.createElementNS(SVG_NS, tag);
+            Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+            if (text) element.textContent = text;
+            return element;
+        }
+
+        function dibujarPerfil(data, analysis) {
+            const svg = byId("profile-svg");
+            svg.replaceChildren();
+
+            const width = 900;
+            const height = 340;
+            const padding = { left: 56, right: 24, top: 24, bottom: 46 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+            const values = [];
+
+            analysis.samples.forEach((sample) => {
+                values.push(sample.adjustedGround, sample.lineOfSight - sample.fresnel, sample.lineOfSight + sample.fresnel);
+            });
+            analysis.obstacleResults.forEach((row) => values.push(row.adjustedTop));
+            values.push(analysis.antennaA, analysis.antennaB, data.elevacionA, data.elevacionB);
+
+            let minValue = Math.min(...values);
+            let maxValue = Math.max(...values);
+            const range = Math.max(maxValue - minValue, 10);
+            minValue -= range * 0.12;
+            maxValue += range * 0.12;
+
+            const x = (position) => padding.left + (position / data.distancia) * chartWidth;
+            const y = (value) => padding.top + ((maxValue - value) / (maxValue - minValue)) * chartHeight;
+
+            for (let index = 0; index <= 4; index += 1) {
+                const yPos = padding.top + (chartHeight * index) / 4;
+                const value = maxValue - ((maxValue - minValue) * index) / 4;
+                svg.appendChild(svgElement("line", {
+                    x1: padding.left,
+                    y1: yPos,
+                    x2: width - padding.right,
+                    y2: yPos,
+                    stroke: "#dedbd3",
+                    "stroke-width": "1"
+                }));
+                svg.appendChild(svgElement("text", {
+                    x: padding.left - 8,
+                    y: yPos + 4,
+                    fill: "#766f64",
+                    "font-size": "10",
+                    "text-anchor": "end"
+                }, `${formatearCompacto(value)} m`));
+            }
+
+            for (let index = 0; index <= 4; index += 1) {
+                const position = (data.distancia * index) / 4;
+                const xPos = x(position);
+                svg.appendChild(svgElement("text", {
+                    x: xPos,
+                    y: height - 17,
+                    fill: "#766f64",
+                    "font-size": "10",
+                    "text-anchor": index === 0 ? "start" : index === 4 ? "end" : "middle"
+                }, `${formatearCompacto(position)} km`));
+            }
+
+            const upper = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight + sample.fresnel)}`);
+            const lower = [...analysis.samples].reverse().map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight - sample.fresnel)}`);
+            svg.appendChild(svgElement("polygon", {
+                points: [...upper, ...lower].join(" "),
+                fill: "#dcebd7",
+                opacity: "0.78"
+            }));
+
+            const groundPoints = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.adjustedGround)}`);
+            const groundPolygon = [
+                `${x(0)},${height - padding.bottom}`,
+                ...groundPoints,
+                `${x(data.distancia)},${height - padding.bottom}`
+            ];
+            svg.appendChild(svgElement("polygon", {
+                points: groundPolygon.join(" "),
+                fill: "#d8cbb7",
+                opacity: "0.88"
+            }));
+            svg.appendChild(svgElement("polyline", {
+                points: groundPoints.join(" "),
+                fill: "none",
+                stroke: "#87745b",
+                "stroke-width": "2"
+            }));
+
+            const lower60 = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight - sample.fresnel * 0.6)}`);
+            svg.appendChild(svgElement("polyline", {
+                points: lower60.join(" "),
+                fill: "none",
+                stroke: "#c6922e",
+                "stroke-width": "2",
+                "stroke-dasharray": "7 5"
+            }));
+
+            const losPoints = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight)}`);
+            svg.appendChild(svgElement("polyline", {
+                points: losPoints.join(" "),
+                fill: "none",
+                stroke: "#2f6a43",
+                "stroke-width": "3"
+            }));
+
+            dibujarAntena(svg, x(0), y(data.elevacionA), y(analysis.antennaA), "A", false);
+            dibujarAntena(svg, x(data.distancia), y(data.elevacionB), y(analysis.antennaB), "B", true);
+
+            analysis.obstacleResults.forEach((row) => {
+                const xPos = x(row.posicion);
+                const groundY = y(row.groundBase + row.bulge);
+                const topY = y(row.adjustedTop);
+                const obstacleHeight = Math.max(groundY - topY, 4);
+
+                svg.appendChild(svgElement("rect", {
+                    x: xPos - 6,
+                    y: groundY - obstacleHeight,
+                    width: "12",
+                    height: obstacleHeight,
+                    rx: "2",
+                    fill: row.clearance < 0 ? "#a1372d" : "#7b674e"
+                }));
+                svg.appendChild(svgElement("circle", {
+                    cx: xPos,
+                    cy: topY,
+                    r: "4",
+                    fill: row.clearance < 0 ? "#a1372d" : "#c6922e",
+                    stroke: "#fff",
+                    "stroke-width": "2"
+                }));
+                svg.appendChild(svgElement("text", {
+                    x: xPos,
+                    y: Math.max(topY - 9, 15),
+                    fill: "#4e463c",
+                    "font-size": "10",
+                    "font-weight": "bold",
+                    "text-anchor": "middle"
+                }, row.nombre));
+            });
+        }
+
+        function dibujarAntena(svg, x, groundY, topY, label, alignRight) {
+            svg.appendChild(svgElement("line", {
+                x1: x,
+                y1: groundY,
+                x2: x,
+                y2: topY,
+                stroke: "#315e75",
+                "stroke-width": "4"
+            }));
+            svg.appendChild(svgElement("circle", {
+                cx: x,
+                cy: topY,
+                r: "6",
+                fill: "#315e75",
+                stroke: "#fff",
+                "stroke-width": "2"
+            }));
+            svg.appendChild(svgElement("text", {
+                x: x + (alignRight ? -11 : 11),
+                y: topY - 9,
+                fill: "#315e75",
+                "font-size": "12",
+                "font-weight": "bold",
+                "text-anchor": alignRight ? "end" : "start"
+            }, `Antena ${label}`));
+        }
+
+        function cargarEjemplo() {
+            cambiarModo("avanzado");
+            byId("distancia").value = "10";
+            byId("frecuencia").value = "5";
+            byId("elevacion-a").value = "102";
+            byId("altura-a").value = "20";
+            byId("elevacion-b").value = "116";
+            byId("altura-b").value = "18";
+            byId("obstacles-list").replaceChildren();
+            agregarObstaculo({ nombre: "Arboleda", distancia: "4", altura: "10" });
+            agregarObstaculo({ nombre: "Edificio", distancia: "7,2", altura: "8" });
+            calcularAvanzado();
+        }
+
+        function limpiarFormulario() {
+            byId("calculator-form").reset();
+            byId("distancia").value = "";
+            byId("frecuencia").value = "";
+            byId("elevacion-a").value = "0";
+            byId("elevacion-b").value = "0";
+            byId("obstacles-list").replaceChildren();
+            actualizarVacioObstaculos();
+            cambiarModo("basico");
+            byId("distancia").focus();
+        }
+
+        document.querySelectorAll(".mode-button").forEach((button) => {
+            button.addEventListener("click", () => cambiarModo(button.dataset.mode));
+        });
+
+        byId("add-obstacle").addEventListener("click", () => agregarObstaculo());
+        byId("load-example").addEventListener("click", cargarEjemplo);
+        byId("clear-form").addEventListener("click", limpiarFormulario);
+        byId("calculator-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (currentMode === "basico") {
+                calcularBasico();
+            } else {
+                calcularAvanzado();
+            }
+        });
+
+        byId("calculator-form").addEventListener("input", (event) => {
+            if (event.target.matches("input")) {
+                event.target.classList.remove("invalid");
+                event.target.removeAttribute("aria-invalid");
+                ocultarResultado();
+            }
+        });
+
+        actualizarVacioObstaculos();
+    </script>
 </body>
 
 </html>
