@@ -24,34 +24,24 @@ El radio máximo se encuentra en el centro del enlace.
 
 Agrega:
 
-- Elevación del terreno en ambos extremos.
 - Altura de cada antena sobre el terreno.
-- Curvatura terrestre efectiva calculada automáticamente con `k = 4/3`.
 - Ninguno, uno o varios obstáculos.
-- Posición y altura de cada obstáculo.
-- Curvatura terrestre efectiva.
+- Nombre y altura de cada obstáculo.
 - Radio F1 específico en cada punto.
-- Despeje vertical y porcentaje respecto de F1.
+- Evaluación final del enlace.
 - Perfil gráfico generado por la propia aplicación.
 
-La curvatura efectiva se calcula con:
+## Interpretación del resultado
 
-```text
-b = (d1 × d2) / (2 × k × R)
-```
+El despeje real se actualiza en cada cálculo y se expresa como porcentaje con la siguiente escala:
 
-usando las distancias en metros, `R = 6.371.000 m` y el factor estándar `k = 4/3`. Este valor se aplica internamente y el usuario no necesita ingresarlo.
+- 80% o más: resultado `ANDA`, despeje `Excelente`.
+- Desde 60% y menos de 80%: resultado `ANDA`, despeje `Regular`.
+- Menos de 60%: `NO ANDA`.
 
-## Interpretación del despeje
+Si falta altura en las antenas, informa cuánto debe aumentarse cada una. Si el problema es un obstáculo, informa cuánto deben subirse ambas antenas o cuánto debe reducirse el obstáculo.
 
-| Despeje respecto de F1 | Interpretación geométrica |
-|---:|---|
-| `≥ 100%` | Primera zona completamente despejada |
-| `≥ 60%` | Cumple el criterio habitual de despeje |
-| `> 0% a < 60%` | Hay línea visual, pero el despeje es insuficiente |
-| `≤ 0%` | El terreno u obstáculo alcanza o cruza la línea visual |
-
-El antiguo límite del 40% fue retirado porque no constituye un umbral técnico general. El 60% se mantiene como referencia principal.
+Las correcciones de altura se redondean hacia arriba a dos decimales para no informar una medida insuficiente.
 
 ## Validaciones
 
@@ -59,13 +49,11 @@ El antiguo límite del 40% fue retirado porque no constituye un umbral técnico 
 - Rechaza campos vacíos y caracteres no numéricos.
 - Distancia, frecuencia y alturas de antena deben ser mayores que cero.
 - Las alturas de obstáculos pueden ser cero.
-- Las elevaciones de los terrenos A y B pueden ser negativas.
-- Todo obstáculo debe ubicarse entre las antenas.
-- Los resultados se calculan con precisión completa y se muestran truncados a dos decimales, sin redondear.
+- Los resultados generales se truncan a dos decimales; las alturas mínimas y correcciones se redondean hacia arriba para asegurar que alcancen.
 
 ## Alcance y supuestos
 
-El modo avanzado interpola la elevación del terreno entre los extremos y aplica la curvatura efectiva sobre ese perfil. La base de cada obstáculo se estima automáticamente según su posición; el usuario sólo ingresa su altura sobre el terreno. Para conservar la fórmula de la consigna, F1 se calcula con `F1 = 8.656 × √(D / f)` para todo el enlace.
+El modo avanzado usa un nivel de terreno común como referencia. Las alturas de las antenas y los obstáculos se miden desde esa base, y los obstáculos se evalúan automáticamente en el centro del enlace. Para conservar la fórmula de la consigna, F1 se calcula con `F1 = 8.656 × √(D / f)` para todo el enlace.
 
 La evaluación describe **geometría, línea visual y despeje de Fresnel**. No garantiza por sí sola el funcionamiento de un enlace. Un diseño completo también necesita potencia transmitida, ganancias de antena, pérdidas, sensibilidad del receptor, margen de desvanecimiento, interferencias y efectos meteorológicos.
 

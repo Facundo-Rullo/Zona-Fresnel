@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculadora educativa de la primera zona de Fresnel con análisis opcional de alturas, curvatura terrestre y obstáculos.">
+    <meta name="description" content="Calculadora educativa de la primera zona de Fresnel con análisis opcional de alturas y obstáculos.">
     <title>Calculadora Zona de Fresnel</title>
     <style>
         * {
@@ -130,6 +130,10 @@
             grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
             gap: 24px;
             margin-top: 24px;
+        }
+
+        .layout.single-column {
+            grid-template-columns: minmax(0, 1fr);
         }
 
         .panel,
@@ -361,7 +365,7 @@
 
         .obstacle-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
+            grid-template-columns: 1.2fr 1fr;
             gap: 11px;
         }
 
@@ -653,47 +657,6 @@
             color: var(--green-dark);
         }
 
-        .scale {
-            display: grid;
-            gap: 10px;
-        }
-
-        .scale-row {
-            display: grid;
-            grid-template-columns: 54px 1fr;
-            gap: 10px;
-            align-items: start;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .scale-badge {
-            padding: 5px 6px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .scale-badge.full {
-            color: var(--green-dark);
-            background: var(--green-soft);
-        }
-
-        .scale-badge.good {
-            color: var(--blue);
-            background: var(--blue-soft);
-        }
-
-        .scale-badge.warn {
-            color: var(--yellow);
-            background: var(--yellow-soft);
-        }
-
-        .scale-badge.bad {
-            color: var(--red);
-            background: var(--red-soft);
-        }
-
         @media (max-width: 980px) {
             .layout {
                 grid-template-columns: 1fr;
@@ -805,7 +768,7 @@
             </div>
         </header>
 
-        <main class="layout">
+        <main class="layout" id="main-layout">
             <section class="panel">
                 <div class="mode-switch" role="tablist" aria-label="Tipo de cálculo">
                     <button class="mode-button" id="tab-basico" type="button" role="tab" aria-selected="true" aria-controls="advanced-fields" data-mode="basico">
@@ -849,25 +812,15 @@
                         <div class="section-heading">
                             <div>
                                 <h2>Perfil de las antenas</h2>
-                                <p>Separar elevación del terreno y altura de la torre evita comparar medidas con referencias diferentes.</p>
+                                <p>Escala del despeje: 80% o más excelente · de 60% a menos de 80% regular · menos de 60% no anda.</p>
                             </div>
                         </div>
 
                         <div class="grid">
                             <div class="field">
-                                <label for="elevacion-a">Elevación del terreno A</label>
-                                <input id="elevacion-a" type="text" inputmode="decimal" autocomplete="off" value="0">
-                                <span class="field-hint">Metros sobre el nivel del mar.</span>
-                            </div>
-                            <div class="field">
                                 <label for="altura-a">Altura de la antena A</label>
                                 <input id="altura-a" type="text" inputmode="decimal" autocomplete="off" placeholder="Ejemplo: 18">
                                 <span class="field-hint">Desde el terreno hasta la antena.</span>
-                            </div>
-                            <div class="field">
-                                <label for="elevacion-b">Elevación del terreno B</label>
-                                <input id="elevacion-b" type="text" inputmode="decimal" autocomplete="off" value="0">
-                                <span class="field-hint">Metros sobre el nivel del mar.</span>
                             </div>
                             <div class="field">
                                 <label for="altura-b">Altura de la antena B</label>
@@ -879,7 +832,7 @@
                         <div class="obstacles-header">
                             <div>
                                 <h3>Obstáculos</h3>
-                                <p>Podés analizar ninguno, uno o varios puntos críticos.</p>
+                                <p>Se evalúan automáticamente en el centro del enlace.</p>
                             </div>
                             <button class="button ghost" id="add-obstacle" type="button">+ Agregar obstáculo</button>
                         </div>
@@ -922,7 +875,6 @@
                         <div class="legend">
                             <span class="legend-item"><span class="legend-dot" style="background:#dcebd7"></span>Primera zona de Fresnel</span>
                             <span class="legend-item"><span class="legend-dot" style="background:#447752"></span>Línea de vista</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#dfb85f"></span>Límite de 60%</span>
                             <span class="legend-item"><span class="legend-dot" style="background:#87745b"></span>Terreno y obstáculos</span>
                         </div>
                     </div>
@@ -930,7 +882,7 @@
                 </section>
             </section>
 
-            <aside class="side-panel">
+            <aside class="side-panel" id="side-panel">
                 <div class="mode-guide" id="basic-guide">
                     <h2>Una respuesta directa</h2>
                     <p class="side-intro">
@@ -953,32 +905,6 @@
                     </div>
                 </div>
 
-                <div class="mode-guide" id="advanced-guide" hidden>
-                    <h2>Cómo leer el despeje</h2>
-                    <p class="side-intro">
-                        El porcentaje compara el espacio libre vertical con el radio F1 calculado para el enlace.
-                        Puede superar 100% cuando sobra altura.
-                    </p>
-                    <div class="scale">
-                        <div class="scale-row">
-                            <span class="scale-badge full">≥100%</span>
-                            <span>La primera zona está completamente despejada en el punto más exigente.</span>
-                        </div>
-                        <div class="scale-row">
-                            <span class="scale-badge good">≥60%</span>
-                            <span>Cumple el criterio geométrico habitual de despeje.</span>
-                        </div>
-                        <div class="scale-row">
-                            <span class="scale-badge warn">0–60%</span>
-                            <span>Hay línea visual, pero no alcanza el despeje recomendado.</span>
-                        </div>
-                        <div class="scale-row">
-                            <span class="scale-badge bad">≤0%</span>
-                            <span>El terreno u obstáculo alcanza o cruza la línea de vista geométrica.</span>
-                        </div>
-                    </div>
-                </div>
-
             </aside>
         </main>
 
@@ -986,8 +912,6 @@
 
     <script>
         const FRESNEL_CENTER_CONSTANT = 8.656;
-        const EARTH_RADIUS_METERS = 6371000;
-        const DEFAULT_EARTH_RADIUS_FACTOR = 4 / 3;
         const SVG_NS = "http://www.w3.org/2000/svg";
 
         let currentMode = "basico";
@@ -1001,6 +925,10 @@
 
         function formatear(numero) {
             return truncarDosDecimales(numero).toFixed(2);
+        }
+
+        function formatearMinimo(numero) {
+            return (Math.ceil(numero * 100 - 1e-9) / 100).toFixed(2);
         }
 
         function formatearCompacto(numero) {
@@ -1076,12 +1004,6 @@
             return FRESNEL_CENTER_CONSTANT * Math.sqrt(distancia / frecuencia);
         }
 
-        function curvaturaEfectiva(distanciaDesdeA, distanciaTotal, factorK) {
-            const d1Metros = distanciaDesdeA * 1000;
-            const d2Metros = (distanciaTotal - distanciaDesdeA) * 1000;
-            return (d1Metros * d2Metros) / (2 * factorK * EARTH_RADIUS_METERS);
-        }
-
         function interpolar(inicio, fin, proporcion) {
             return inicio + (fin - inicio) * proporcion;
         }
@@ -1096,7 +1018,8 @@
 
             byId("advanced-fields").hidden = !advanced;
             byId("basic-guide").hidden = advanced;
-            byId("advanced-guide").hidden = !advanced;
+            byId("side-panel").hidden = advanced;
+            byId("main-layout").classList.toggle("single-column", advanced);
             byId("formula-caption").textContent = advanced
                 ? "Fórmula de la consigna aplicada al enlace"
                 : "Radio máximo de la primera zona de Fresnel";
@@ -1116,7 +1039,7 @@
 
             const empty = document.createElement("div");
             empty.className = "empty-obstacles";
-            empty.textContent = "No agregaste obstáculos. El cálculo analizará solamente el terreno estimado y la curvatura efectiva.";
+            empty.textContent = "No agregaste obstáculos. El cálculo analizará solamente el terreno estimado.";
             list.appendChild(empty);
         }
 
@@ -1150,7 +1073,6 @@
             grid.className = "obstacle-grid";
             grid.append(
                 crearCampoObstaculo("Nombre", "obstacle-name", valores.nombre ?? "", "Ej: edificio", "text"),
-                crearCampoObstaculo("Distancia desde A (km)", "obstacle-distance", valores.distancia ?? "", "Ej: 4"),
                 crearCampoObstaculo("Altura sobre terreno (m)", "obstacle-height", valores.altura ?? "0", "Ej: 12")
             );
 
@@ -1196,25 +1118,19 @@
             };
         }
 
-        function leerObstaculos(distanciaTotal, errores) {
+        function leerObstaculos(errores) {
             return Array.from(document.querySelectorAll(".obstacle-card")).map((card, index) => {
-                const distanceInput = card.querySelector(".obstacle-distance");
                 const heightInput = card.querySelector(".obstacle-height");
                 const nombreInput = card.querySelector(".obstacle-name");
                 const nombre = nombreInput.value.trim() || `Obstáculo ${index + 1}`;
-                const distancia = parsearNumero(distanceInput.value);
                 const altura = parsearNumero(heightInput.value, { permitirCero: true });
 
-                if (distancia === null || distancia >= distanciaTotal) {
-                    marcarInvalido(distanceInput);
-                    errores.push(`${nombre}: posición mayor que 0 y menor que la distancia total`);
-                }
                 if (altura === null) {
                     marcarInvalido(heightInput);
                     errores.push(`${nombre}: altura`);
                 }
 
-                return { nombre, distancia, altura };
+                return { nombre, altura };
             });
         }
 
@@ -1262,7 +1178,7 @@
                 ""
             );
             setStat(1, "Radio máximo F1", `${formatear(fresnel)} m`);
-            setStat(2, "60% de F1", `${formatear(fresnel * 0.6)} m`);
+            setStat(2, "Distancia", `${formatear(distancia)} km`);
             setStat(3, "Ubicación del máximo", `${formatear(distancia / 2)} km`);
             mostrarResultado();
         }
@@ -1272,15 +1188,11 @@
             ocultarResultado();
             const errores = [];
             const { distancia, frecuencia } = leerDatosComunes(errores);
-            const elevacionA = leerCampo("elevacion-a", { permitirNegativo: true }, "elevación del terreno A", errores);
             const alturaA = leerCampo("altura-a", {}, "altura de la antena A", errores);
-            const elevacionB = leerCampo("elevacion-b", { permitirNegativo: true }, "elevación del terreno B", errores);
             const alturaB = leerCampo("altura-b", {}, "altura de la antena B", errores);
-            const factorK = DEFAULT_EARTH_RADIUS_FACTOR;
-
             let obstacles = [];
             if (distancia !== null) {
-                obstacles = leerObstaculos(distancia, errores);
+                obstacles = leerObstaculos(errores);
             }
 
             if (errores.length) {
@@ -1288,14 +1200,14 @@
                 return;
             }
 
-            const data = { distancia, frecuencia, elevacionA, alturaA, elevacionB, alturaB, factorK, obstacles };
+            const data = { distancia, frecuencia, alturaA, alturaB, obstacles };
             const analysis = analizarPerfil(data);
             presentarAnalisis(data, analysis);
         }
 
         function analizarPerfil(data) {
-            const antennaA = data.elevacionA + data.alturaA;
-            const antennaB = data.elevacionB + data.alturaB;
+            const antennaA = data.alturaA;
+            const antennaB = data.alturaB;
             const samples = [];
 
             for (let index = 0; index <= 240; index += 1) {
@@ -1303,39 +1215,36 @@
                 const posicion = data.distancia * proporcion;
                 const fresnel = radioFresnelMaximo(data.distancia, data.frecuencia);
                 const lineOfSight = interpolar(antennaA, antennaB, proporcion);
-                const groundBase = interpolar(data.elevacionA, data.elevacionB, proporcion);
-                const bulge = curvaturaEfectiva(posicion, data.distancia, data.factorK);
-                const adjustedGround = groundBase + bulge;
-                const clearance = lineOfSight - adjustedGround;
-                const percentage = fresnel > 0 ? (clearance / fresnel) * 100 : Infinity;
+                const groundBase = 0;
+                const clearance = lineOfSight - groundBase;
+                const clearanceRatio = fresnel > 0 ? clearance / fresnel : Infinity;
 
-                samples.push({ posicion, fresnel, lineOfSight, groundBase, bulge, adjustedGround, clearance, percentage });
+                samples.push({ posicion, fresnel, lineOfSight, groundBase, clearance, clearanceRatio });
             }
 
             const terrainCritical = samples.slice(1, -1).reduce((worst, sample) => {
-                return !worst || sample.percentage < worst.percentage ? sample : worst;
+                return !worst || sample.clearanceRatio < worst.clearanceRatio ? sample : worst;
             }, null);
 
             const obstacleResults = data.obstacles.map((obstacle) => {
-                const proporcion = obstacle.distancia / data.distancia;
+                const posicion = data.distancia / 2;
+                const proporcion = 0.5;
                 const fresnel = radioFresnelMaximo(data.distancia, data.frecuencia);
                 const lineOfSight = interpolar(antennaA, antennaB, proporcion);
-                const groundBase = interpolar(data.elevacionA, data.elevacionB, proporcion);
-                const bulge = curvaturaEfectiva(obstacle.distancia, data.distancia, data.factorK);
-                const adjustedTop = groundBase + obstacle.altura + bulge;
+                const groundBase = 0;
+                const adjustedTop = groundBase + obstacle.altura;
                 const clearance = lineOfSight - adjustedTop;
-                const percentage = (clearance / fresnel) * 100;
+                const clearanceRatio = clearance / fresnel;
 
                 return {
                     nombre: obstacle.nombre,
-                    posicion: obstacle.distancia,
+                    posicion,
                     fresnel,
-                    bulge,
                     lineOfSight,
                     groundBase,
                     adjustedTop,
                     clearance,
-                    percentage,
+                    clearanceRatio,
                     obstacle
                 };
             });
@@ -1344,15 +1253,14 @@
                 nombre: "Terreno estimado",
                 posicion: terrainCritical.posicion,
                 fresnel: terrainCritical.fresnel,
-                bulge: terrainCritical.bulge,
                 lineOfSight: terrainCritical.lineOfSight,
-                adjustedTop: terrainCritical.adjustedGround,
+                adjustedTop: terrainCritical.groundBase,
                 clearance: terrainCritical.clearance,
-                percentage: terrainCritical.percentage
+                clearanceRatio: terrainCritical.clearanceRatio
             };
 
             const rows = [terrainRow, ...obstacleResults];
-            const worst = rows.reduce((current, row) => row.percentage < current.percentage ? row : current);
+            const worst = rows.reduce((current, row) => row.clearanceRatio < current.clearanceRatio ? row : current);
 
             return {
                 antennaA,
@@ -1365,37 +1273,72 @@
             };
         }
 
-        function presentarAnalisis(data, analysis) {
-            const worst = analysis.worst;
-            byId("result-stats").hidden = false;
-            let style;
-            let title;
-            let note;
+        function evaluarEstado(worst, analysis) {
+            const requiredClearance = worst.fresnel * 0.6;
+            const clearancePercentage = Math.max(0, worst.clearanceRatio * 100);
 
-            if (worst.clearance <= 0) {
-                style = "bad";
-                title = "Línea de vista obstruida";
-                note = worst.clearance < 0
-                    ? `${worst.nombre} supera la línea directa en ${formatear(Math.abs(worst.clearance))} m. Esto describe la geometría; no es una predicción completa de recepción.`
-                    : `${worst.nombre} alcanza la línea directa entre las antenas. Esto describe la geometría; no es una predicción completa de recepción.`;
-            } else if (worst.percentage < 60) {
-                style = "warn";
-                title = "Despeje insuficiente";
-                note = `${worst.nombre} conserva ${formatear(worst.percentage)}% de F1. Hay línea visual, pero no alcanza el criterio recomendado del 60%.`;
-            } else if (worst.percentage < 100) {
-                style = "info";
-                title = "Cumple el criterio del 60%";
-                note = `${worst.nombre} es el punto más exigente, con ${formatear(worst.percentage)}% de despeje respecto de F1.`;
-            } else {
-                style = "ok";
-                title = "Primera zona completamente despejada";
-                note = `Incluso en ${worst.nombre}, el punto más exigente, queda un despeje equivalente a ${formatear(worst.percentage)}% de F1.`;
+            if (clearancePercentage >= 80) {
+                return {
+                    style: "ok",
+                    title: "ANDA",
+                    quality: "Excelente",
+                    note: `Despeje: ${formatear(clearancePercentage)}% — Excelente.`,
+                    requiredClearance,
+                    clearancePercentage
+                };
             }
 
-            setStatus(style, "Evaluación geométrica del perfil", title, note);
+            if (clearancePercentage >= 60) {
+                return {
+                    style: "warn",
+                    title: "ANDA",
+                    quality: "Regular",
+                    note: `Despeje: ${formatear(clearancePercentage)}% — Regular.`,
+                    requiredClearance,
+                    clearancePercentage
+                };
+            }
+
+            if (worst.obstacle) {
+                const requiredImprovement = requiredClearance - worst.clearance;
+                return {
+                    style: "bad",
+                    title: "NO ANDA",
+                    quality: "No anda",
+                    note: `El despeje calculado es ${formatear(clearancePercentage)}%. ${worst.nombre} no deja suficiente espacio para la señal. Solución: subí ambas antenas ${formatearMinimo(requiredImprovement)} m o reducí la altura de ${worst.nombre} en ${formatearMinimo(requiredImprovement)} m.`,
+                    requiredClearance,
+                    clearancePercentage
+                };
+            }
+
+            const missingA = Math.max(0, requiredClearance - analysis.antennaA);
+            const missingB = Math.max(0, requiredClearance - analysis.antennaB);
+            const correctionA = missingA > 1e-9
+                ? `subí la antena A ${formatearMinimo(missingA)} m`
+                : "la antena A ya cumple";
+            const correctionB = missingB > 1e-9
+                ? `subí la antena B ${formatearMinimo(missingB)} m`
+                : "la antena B ya cumple";
+
+            return {
+                style: "bad",
+                title: "NO ANDA",
+                quality: "No anda",
+                note: `El despeje calculado es ${formatear(clearancePercentage)}%. Las antenas son demasiado bajas para esta distancia y frecuencia. Solución: ${correctionA} y ${correctionB}.`,
+                requiredClearance,
+                clearancePercentage
+            };
+        }
+
+        function presentarAnalisis(data, analysis) {
+            const worst = analysis.worst;
+            const evaluation = evaluarEstado(worst, analysis);
+            byId("result-stats").hidden = false;
+
+            setStatus(evaluation.style, "Resultado del enlace", evaluation.title, evaluation.note);
             setStat(1, "Radio máximo F1", `${formatear(analysis.maxFresnel)} m`);
-            setStat(2, "Peor despeje / F1", `${formatear(worst.percentage)} %`);
-            setStat(3, "Punto más exigente", worst.nombre);
+            setStat(2, "Despeje", `${formatear(evaluation.clearancePercentage)} % — ${evaluation.quality}`);
+            setStat(3, "Resultado", evaluation.title);
 
             dibujarPerfil(data, analysis);
             byId("profile-card").hidden = false;
@@ -1421,10 +1364,10 @@
             const values = [];
 
             analysis.samples.forEach((sample) => {
-                values.push(sample.adjustedGround, sample.lineOfSight - sample.fresnel, sample.lineOfSight + sample.fresnel);
+                values.push(sample.groundBase, sample.lineOfSight - sample.fresnel, sample.lineOfSight + sample.fresnel);
             });
             analysis.obstacleResults.forEach((row) => values.push(row.adjustedTop));
-            values.push(analysis.antennaA, analysis.antennaB, data.elevacionA, data.elevacionB);
+            values.push(analysis.antennaA, analysis.antennaB, 0);
 
             let minValue = Math.min(...values);
             let maxValue = Math.max(...values);
@@ -1475,7 +1418,7 @@
                 opacity: "0.78"
             }));
 
-            const groundPoints = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.adjustedGround)}`);
+            const groundPoints = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.groundBase)}`);
             const groundPolygon = [
                 `${x(0)},${height - padding.bottom}`,
                 ...groundPoints,
@@ -1493,15 +1436,6 @@
                 "stroke-width": "2"
             }));
 
-            const lower60 = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight - sample.fresnel * 0.6)}`);
-            svg.appendChild(svgElement("polyline", {
-                points: lower60.join(" "),
-                fill: "none",
-                stroke: "#c6922e",
-                "stroke-width": "2",
-                "stroke-dasharray": "7 5"
-            }));
-
             const losPoints = analysis.samples.map((sample) => `${x(sample.posicion)},${y(sample.lineOfSight)}`);
             svg.appendChild(svgElement("polyline", {
                 points: losPoints.join(" "),
@@ -1510,12 +1444,12 @@
                 "stroke-width": "3"
             }));
 
-            dibujarAntena(svg, x(0), y(data.elevacionA), y(analysis.antennaA), "A", false);
-            dibujarAntena(svg, x(data.distancia), y(data.elevacionB), y(analysis.antennaB), "B", true);
+            dibujarAntena(svg, x(0), y(0), y(analysis.antennaA), "A", false);
+            dibujarAntena(svg, x(data.distancia), y(0), y(analysis.antennaB), "B", true);
 
             analysis.obstacleResults.forEach((row) => {
                 const xPos = x(row.posicion);
-                const groundY = y(row.groundBase + row.bulge);
+                const groundY = y(row.groundBase);
                 const topY = y(row.adjustedTop);
                 const obstacleHeight = Math.max(groundY - topY, 4);
 
@@ -1577,13 +1511,11 @@
             cambiarModo("avanzado");
             byId("distancia").value = "10";
             byId("frecuencia").value = "5";
-            byId("elevacion-a").value = "102";
             byId("altura-a").value = "20";
-            byId("elevacion-b").value = "116";
             byId("altura-b").value = "18";
             byId("obstacles-list").replaceChildren();
-            agregarObstaculo({ nombre: "Arboleda", distancia: "4", altura: "10" });
-            agregarObstaculo({ nombre: "Edificio", distancia: "7,2", altura: "8" });
+            agregarObstaculo({ nombre: "Arboleda", altura: "10" });
+            agregarObstaculo({ nombre: "Edificio", altura: "8" });
             calcularAvanzado();
         }
 
@@ -1591,8 +1523,6 @@
             byId("calculator-form").reset();
             byId("distancia").value = "";
             byId("frecuencia").value = "";
-            byId("elevacion-a").value = "0";
-            byId("elevacion-b").value = "0";
             byId("obstacles-list").replaceChildren();
             actualizarVacioObstaculos();
             cambiarModo("basico");
